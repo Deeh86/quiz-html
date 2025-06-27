@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .quiz-container {
+            font-family: Arial, sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .course-header {
+            text-align: center;
+            background: #00145a;
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .course-title {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .course-subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        
+        .start-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+            margin: 20px auto;
+        }
+        
+        .start-btn:hover {
+            background: #45a049;
+        }
+
+        /* Novos estilos para os elementos de resultado */
+        .resultado-preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .resultado-item {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .resultado-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .resultado-valor {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        
+        .quiz-area {
+            display: none;
+        }
+        
+        .progress {
+            background: #e0e0e0;
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-fill {
+            background: #4CAF50;
+            height: 100%;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .question {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .question-num {
+            color: #2196F3;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .question-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            border-color: #4CAF50;
+            background: #f1f8e9;
+        }
+        
+        .option.selected {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+        
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .option.wrong {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .option input {
+            margin-right: 10px;
+        }
+        
+        .submit-btn {
+            background: #2196F3;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: #1976D2;
+        }
+        
+        .result {
+            display: none;
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .result-msg {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .result-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .retry-btn {
+            background: #FF9800;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .retry-btn:hover {
+            background: #F57C00;
+        }
+        
+        .debug-info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .quiz-container {
+                padding: 15px;
+            }
+            .course-title {
+                font-size: 1.5em;
+            }
+            .question-text {
+                font-size: 1.1em;
+            }
+            .resultado-preview {
+                flex-direction: column;
+            }
+            .resultado-item {
+                margin-bottom: 10px;
+            }
+            .result-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Header do Curso -->
+        <div class="course-header">
+            <div class="course-title">Mercado de Trabalho</div>
+            <div class="course-subtitle">Entrevista de Emprego e Currículo</div>
+        </div>
+        
+        <!-- Preview dos Resultados -->
+        <div id="resultadoPreview" class="resultado-preview">
+            <div class="resultado-item">
+                <div class="resultado-label">Acertos</div>
+                <div id="acertos" class="resultado-valor">0</div>
+            </div>
+            <div class="resultado-item">
+                <div class="resultado-label">Aproveitamento</div>
+                <div id="aproveitamento" class="resultado-valor">0%</div>
+            </div>
+            <div class="resultado-item">
+                <div class="resultado-label">Média</div>
+                <div id="media" class="resultado-valor">0.0</div>
+            </div>
+        </div>
+
+        <!-- Debug Info -->
+        <div id="debugInfo" class="debug-info">
+            <strong>Debug:</strong> <span id="debugText">Aguardando...</span>
+        </div>
+        
+        <!-- Seção Inicial -->
+        <div id="inicialSection">
+            <button class="start-btn" onclick="iniciarQuiz()">🎯 Iniciar Avaliação</button>
+        </div>
+        
+        <!-- Área do Quiz -->
+        <div id="quizArea" class="quiz-area">
+            <div class="progress">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+            <div id="questionsDiv"></div>
+            <button id="submitBtn" class="submit-btn" onclick="enviarRespostas()" disabled>✅ Enviar Avaliação</button>
+        </div>
+        
+        <!-- Resultado -->
+        <div id="resultDiv" class="result">
+            <div id="scoreDiv" class="score">0%</div>
+            <div id="resultMsg" class="result-msg"></div>
+            
+            <!-- Estatísticas detalhadas -->
+            <div class="result-stats">
+                <div class="stat-item">
+                    <div id="statAcertos" class="stat-value">0</div>
+                    <div class="stat-label">Acertos</div>
+                </div>
+                <div class="stat-item">
+                    <div id="statAproveitamento" class="stat-value">0%</div>
+                    <div class="stat-label">Aproveitamento</div>
+                </div>
+                <div class="stat-item">
+                    <div id="statMedia" class="stat-value">0.0</div>
+                    <div class="stat-label">Média</div>
+                </div>
+            </div>
+            
+            <div id="resultDetails" class="result-details"></div>
+            <button class="retry-btn" onclick="reiniciar()">🔄 Tentar Novamente</button>
+        </div>
+    </div>
+
+    <script>
+        const perguntas = [
+            {
+                "enunciado": "Quais informações pessoais devem ser incluídas no currículo, segundo as orientações do vídeo?",
+                "alternativas": ["Foto colorida de corpo inteiro, idade e endereço completo.", "Nome completo, telefone, e-mail profissional, cidade onde mora e link do LinkedIn (caso tenha).", "Nome completo, número dos documentos e data de nascimento."],
+                "correta": 1
+            },
+            {
+                "enunciado": "Qual das alternativas abaixo não está correta sobre por que é importante que pessoas com deficiência indiquem essa informação no currículo, junto com o número do CID?",
+                "alternativas": ["Para que a empresa possa oferecer um ambiente mais acessível e adaptar o processo seletivo, se necessário.", "Para que a empresa somente te indique para vagas destinadas a pessoas com deficiência.", "Para facilitar o processo de candidatura, garantir o cumprimento da Lei de Cotas e permitir adaptações no ambiente de trabalho."],
+                "correta": 1
+            },
+            {
+                "enunciado": "Quais tipos de experiências informais ou voluntárias também devem ser incluídas no currículo, de acordo com o vídeo?",
+                "alternativas": ["Trabalhos apresentados na escola ou universidade.", "Trabalhos autônomos, ações voluntárias em comunidades, participação em eventos e projetos sociais, mesmo sem registro em carteira.", "Somente experiências que resultaram em certificados."],
+                "correta": 1
+            }
+        ];
+
+        let respostas = [];
+
+        // Debug function
+        function debug(message) {
+            console.log('QUIZ DEBUG:', message);
+            const debugElement = document.getElementById('debugText');
+            if (debugElement) {
+                debugElement.textContent = message;
+                document.getElementById('debugInfo').style.display = 'block';
+            }
+        }
+
+        // Função para atualizar os elementos de resultado
+        function atualizarElementosResultado(acertos, total) {
+            const porcentagem = Math.round((acertos / total) * 100);
+            const media = (porcentagem / 10).toFixed(1);
+
+            // Atualiza elementos do preview
+            document.getElementById('acertos').textContent = acertos;
+            document.getElementById('aproveitamento').textContent = porcentagem + '%';
+            document.getElementById('media').textContent = media;
+
+            // Atualiza elementos das estatísticas
+            document.getElementById('statAcertos').textContent = acertos;
+            document.getElementById('statAproveitamento').textContent = porcentagem + '%';
+            document.getElementById('statMedia').textContent = media;
+
+            // Aplica cores baseadas no desempenho
+            let cor = '#666';
+            if (porcentagem >= 80) {
+                cor = '#4CAF50';
+            } else if (porcentagem >= 60) {
+                cor = '#FF9800';
+            } else {
+                cor = '#f44336';
+            }
+
+            document.getElementById('acertos').style.color = cor;
+            document.getElementById('aproveitamento').style.color = cor;
+            document.getElementById('media').style.color = cor;
+            document.getElementById('statAcertos').style.color = cor;
+            document.getElementById('statAproveitamento').style.color = cor;
+            document.getElementById('statMedia').style.color = cor;
+        }
+
+        function iniciarQuiz() {
+            debug('Quiz iniciado');
+            document.getElementById('inicialSection').style.display = 'none';
+            document.getElementById('quizArea').style.display = 'block';
+            criarPerguntas();
+        }
+
+        function criarPerguntas() {
+            const div = document.getElementById('questionsDiv');
+            div.innerHTML = '';
+            
+            perguntas.forEach((p, i) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <div class="question-num">Pergunta ${i + 1} de ${perguntas.length}</div>
+                    <div class="question-text">${p.enunciado}</div>
+                    ${p.alternativas.map((alt, j) => `
+                        <div class="option" onclick="selecionar(${i}, ${j})">
+                            <input type="radio" name="q${i}" value="${j}" id="q${i}_${j}">
+                            <label for="q${i}_${j}">${alt}</label>
+                        </div>
+                    `).join('')}
+                `;
+                div.appendChild(questionDiv);
+            });
+        }
+
+        function selecionar(pergunta, resposta) {
+            // Remove seleções anteriores
+            document.querySelectorAll(`input[name="q${pergunta}"]`).forEach(input => {
+                input.parentElement.classList.remove('selected');
+            });
+            
+            // Adiciona nova seleção
+            const radio = document.getElementById(`q${pergunta}_${resposta}`);
+            radio.checked = true;
+            radio.parentElement.classList.add('selected');
+            
+            respostas[pergunta] = resposta;
+            
+            // Atualiza progresso
+            const respondidas = respostas.filter(r => r !== undefined).length;
+            const progresso = (respondidas / perguntas.length) * 100;
+            document.getElementById('progressBar').style.width = progresso + '%';
+            
+            // Habilita botão se todas respondidas
+            if (respondidas === perguntas.length) {
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        function enviarRespostas() {
+            debug('Enviando respostas...');
+            let acertos = 0;
+            
+            perguntas.forEach((p, i) => {
+                const opcoes = document.querySelectorAll(`input[name="q${i}"]`);
+                opcoes.forEach((opcao, j) => {
+                    const div = opcao.parentElement;
+                    if (j === p.correta) {
+                        div.classList.add('correct');
+                    } else if (j === respostas[i] && j !== p.correta) {
+                        div.classList.add('wrong');
+                    }
+                });
+                
+                if (respostas[i] === p.correta) {
+                    acertos++;
+                }
+            });
+            
+            // Desabilita opções
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.disabled = true;
+            });
+            document.getElementById('submitBtn').style.display = 'none';
+            
+            setTimeout(() => mostrarResultado(acertos), 1500);
+        }
+
+        function mostrarResultado(acertos) {
+            const porcentagem = Math.round((acertos / perguntas.length) * 100);
+            
+            debug(`Resultado: ${acertos}/${perguntas.length} (${porcentagem}%)`);
+            
+            // Atualiza os elementos de resultado
+            atualizarElementosResultado(acertos, perguntas.length);
+            
+            document.getElementById('quizArea').style.display = 'none';
+            document.getElementById('resultDiv').style.display = 'block';
+            document.getElementById('scoreDiv').textContent = porcentagem + '%';
+            
+            let mensagem = '';
+            if (porcentagem >= 80) {
+                mensagem = '🎉 Excelente! Você domina o assunto!';
+            } else if (porcentagem >= 60) {
+                mensagem = '👍 Bom trabalho! Continue estudando!';
+            } else {
+                mensagem = '📚 Precisa estudar mais. Tente novamente!';
+            }
+            
+            document.getElementById('resultMsg').textContent = mensagem;
+            document.getElementById('resultDetails').innerHTML = `
+                <strong>Resumo:</strong><br>
+                ✅ Acertos: ${acertos} de ${perguntas.length}<br>
+                ❌ Erros: ${perguntas.length - acertos}<br>
+                📊 Aproveitamento: ${porcentagem}%<br>
+                📝 Média: ${(porcentagem / 10).toFixed(1)}
+            `;
+
+            // Dados para envio
+            const dadosResultado = {
+                curso: 'Mercado de Trabalho',
+                total: perguntas.length,
+                acertos: acertos,
+                porcentagem: porcentagem,
+                media: (porcentagem / 10).toFixed(1)
+            };
+
+            // Envia os dados para o Wix
+            enviarDadosParaWix(dadosResultado);
+        }
+
+        function enviarDadosParaWix(dadosResultado) {
+            debug('Enviando resultado para Wix...');
+
+            // Método 1: PostMessage para window pai
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'quizResultado',
+                        data: dadosResultado
+                    }, '*');
+                    debug('Método 1: PostMessage enviado');
+                }
+            } catch (e) {
+                debug('Método 1 falhou: ' + e.message);
+            }
+
+            // Método 2: Global variable
+            try {
+                if (typeof window !== 'undefined') {
+                    window.quizResultData = dadosResultado;
+                    debug('Método 2: Variável global definida');
+                }
+            } catch (e) {
+                debug('Método 2 falhou: ' + e.message);
+            }
+
+            // Método 3: Callback function
+            try {
+                if (typeof window !== 'undefined' && window.parent && typeof window.parent.salvarQuizResultado === 'function') {
+                    window.parent.salvarQuizResultado(dadosResultado);
+                    debug('Método 3: Callback executado');
+                }
+            } catch (e) {
+                debug('Método 3 falhou: ' + e.message);
+            }
+
+            // Método 4: Custom event
+            try {
+                const event = new CustomEvent('quizCompleto', {
+                    detail: dadosResultado
+                });
+                window.dispatchEvent(event);
+                if (window.parent && window.parent !== window) {
+                    window.parent.dispatchEvent(event);
+                }
+                debug('Método 4: Custom event disparado');
+            } catch (e) {
+                debug('Método 4 falhou: ' + e.message);
+            }
+
+            debug('Todos os métodos de envio tentados');
+        }
+
+        function reiniciar() {
+            respostas = [];
+            document.getElementById('resultDiv').style.display = 'none';
+            document.getElementById('inicialSection').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('debugInfo').style.display = 'none';
+            
+            // Reseta os elementos de resultado
+            atualizarElementosResultado(0, perguntas.length);
+        }
+
+        // Inicializa debug
+        debug('Quiz HTML carregado e pronto');
+        
+        // Inicializa elementos de resultado
+        atualizarElementosResultado(0, perguntas.length);
+    </script>
+</body>
+</html>
